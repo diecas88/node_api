@@ -52,14 +52,14 @@ app.get('/users', (req, res) => {
         if (result.length > 0) {
             res.json(result);
         } else {
-            res.send("no rows!");
+            res.send([]);
         }
     })
 
 });
 
 //create
-app.post('/add', (req, res) => {
+app.post('/add', bodyParser.json(), (req, res) => {
 
     const sql = 'insert into users set ?';
 
@@ -72,10 +72,11 @@ app.post('/add', (req, res) => {
         user_role: req.body.user_role,
         gender: req.body.gender
     }
+    console.log(userObject);
 
     conn.query(sql, userObject, error => {
         if (error) throw error;
-        res.send("was created!");
+        res.send({ rta: "was created!" });
     })
 });
 
@@ -90,13 +91,13 @@ app.get('/user/:id', (req, res) => {
         if (result.length > 0) {
             res.json(result);
         } else {
-            res.json({ note: 'no found!' });
+            res.json({ rta: 'no found!' });
         }
     })
 });
 
 // update
-app.put('/update/:id', (req, res) => {
+app.put('/update/:id', bodyParser.json(), (req, res) => {
 
     const { id } = req.params;
     const {
@@ -116,7 +117,7 @@ app.put('/update/:id', (req, res) => {
 
     conn.query(sql, error => {
         if (error) throw error;
-        res.send("was updated!");
+        res.send({ rta: "was updated!" });
     })
 
 });
@@ -129,7 +130,7 @@ app.delete('/delete/:id', (req, res) => {
 
     conn.query(sql, error => {
         if (error) throw error;
-        res.send("was deleted!");
+        res.send({ rta: "was deleted!" });
     })
 
 
