@@ -41,7 +41,8 @@ app.get('/', (req, res) => {
     res.send('wellcome here!');
 });
 
-// see all
+/* inicio de rutas para la creacion de usuarios */
+// obtain users for admin
 app.get('/users', (req, res) => {
 
     const sql = "select * from users";
@@ -58,7 +59,7 @@ app.get('/users', (req, res) => {
 
 });
 
-//create
+//create users for admin
 app.post('/add', bodyParser.json(), (req, res) => {
 
     const sql = 'insert into users set ?';
@@ -80,7 +81,7 @@ app.post('/add', bodyParser.json(), (req, res) => {
     })
 });
 
-//read
+//read info from users (detail)
 app.get('/user/:id', (req, res) => {
     const { id } = req.params;
     const sql = `select * from users where id_user=${id}`;
@@ -96,7 +97,7 @@ app.get('/user/:id', (req, res) => {
     })
 });
 
-// update
+// update info for users
 app.put('/update/:id', bodyParser.json(), (req, res) => {
 
     const { id } = req.params;
@@ -122,7 +123,7 @@ app.put('/update/:id', bodyParser.json(), (req, res) => {
 
 });
 
-// delete
+// delete info users, user complete
 app.delete('/delete/:id', (req, res) => {
     const { id } = req.params;
 
@@ -135,6 +136,98 @@ app.delete('/delete/:id', (req, res) => {
 
 
 });
+
+
+/* this is the begining of methods for creating task, user 75 by default */
+
+// get or obtain all task
+app.get('/tasks', (req, res) => {
+
+    const sql = "select * from task";
+
+    conn.query(sql, (error, result) => {
+        if (error) throw error;
+
+        if (result.length > 0) {
+            res.json(result);
+        } else {
+            res.send([]);
+        }
+    })
+
+});
+
+//create a task user 75 by default
+app.post('/tasks', bodyParser.json(), (req, res) => {
+
+    const sql = 'insert into task set ?';
+
+    const userObject = {
+        id_user: req.body.id_user,
+        name_task: req.body.name_task,
+        description_task: req.body.description_task,
+    }
+    console.log(userObject);
+
+    conn.query(sql, userObject, function(error, results) {
+        if (error) throw error;
+        res.send({ id_task: results.insertId });
+    })
+});
+
+//read tasks from user (detail)
+app.get('/tasks/:id', (req, res) => {
+    const { id } = req.params;
+    const sql = `select * from task where id_task=${id}`;
+
+    conn.query(sql, (error, result) => {
+        if (error) throw error;
+
+        if (result.length > 0) {
+            res.json(result);
+        } else {
+            res.json({ rta: 'no found!' });
+        }
+    })
+});
+
+// update task from users 
+app.put('/tasks/:id', bodyParser.json(), (req, res) => {
+
+    const { id } = req.params;
+    const {
+        id_task,
+        name_task,
+        description_task
+    } = req.body;
+
+    const sql = `update task set name_task = '${name_task}',
+        description_task='${description_task}'
+        where id_task=${id_task}`;
+
+    conn.query(sql, error => {
+        if (error) throw error;
+        res.send({ rta: "was updated!" });
+    })
+
+});
+
+// delete all task info 
+app.delete('/tasks/:id', (req, res) => {
+    const { id } = req.params;
+
+    const sql = `delete from task where id_task = ${id}`;
+
+    conn.query(sql, error => {
+        if (error) throw error;
+        res.send({ rta: "was deleted!" });
+    })
+
+
+});
+
+
+
 
 // here check connection
 conn.connect(error => {
